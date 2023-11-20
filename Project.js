@@ -4,6 +4,12 @@ const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene,
 } = tiny;
 
+export class Platform{
+    constructor() {
+
+    }
+}
+
 export class Project extends Scene {
     constructor() {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
@@ -26,6 +32,8 @@ export class Project extends Scene {
                 {ambient: .4, diffusivity: .6, color: hex_color("#ffffff")}),
             test2: new Material(new Gouraud_Shader(),
                 {ambient: .4, diffusivity: .6, color: hex_color("#992828")}),
+            player_material: new Material(new Gouraud_Shader(),
+                {ambient: .4, diffusivity: .6, color: hex_color("#0000FF")}),
             ring: new Material(new Ring_Shader()),
             // TODO:  Fill in as many additional material objects as needed in this key/value table.
             //        (Requirement 4)
@@ -33,8 +41,15 @@ export class Project extends Scene {
 
         this.platform_radius = 5;
         this.platform_length = 50;
+        this.player_depth = 0;
 
-        this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
+        this.player_height = 2;
+        this.player_tranform = Mat4.identity().times(Mat4.translation(0, -this.platform_radius + this.player_height/2, 0));
+
+        this.camera_position = Mat4.look_at(vec3(0, 0, -1), vec3(0, 0, 0), vec3(0, 1, 0));
+
+        this.plaforms = [];
+        this.first_platform = 0;
     }
 
     make_control_panel() {
@@ -56,13 +71,28 @@ export class Project extends Scene {
         this.shapes.tube.draw(context, program_state, model_transform, this.materials.test.override({color: yellow}));
     }
 
+    player(context, program_state){
+        this.player_depth = program_state.animation_time / 200;
+        let depth_transform = Mat4.translation(0, 0, this.player_depth);
+        this.shapes.sphere.draw(context, program_state, this.player_tranform.times(depth_transform), this.materials.player_material)
+    }
+
+    camera(context, program_state){
+        let eye = Mat4.translation(0, 0, this.player_depth - 15).times(vec4(0, 0, 0, 1));
+        let at = Mat4.translation(0, 0, this.player_depth).times(vec4(0, 0, 0, 1));
+        let up = Mat4.translation(0, 1, this.player_depth).times(vec4(0, 0, 0, 1));
+        console.log(eye, at, up);
+        this.camera_position = Mat4.look_at(eye.to3(), at.to3(), up.to3());
+        program_state.set_camera(this.camera_position);
+    }
+
     display(context, program_state) {
         // display():  Called once per frame of animation.
         // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
         if (!context.scratchpad.controls) {
             this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
             // Define the global camera and projection matrices, which are stored in program_state.
-            program_state.set_camera(this.initial_camera_location);
+            program_state.set_camera(this.camera_position);
         }
 
         program_state.projection_transform = Mat4.perspective(
@@ -80,6 +110,8 @@ export class Project extends Scene {
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
 
         this.platform(context, program_state);
+        this.player(context, program_state);
+        this.camera(context, program_state);
     }
 }
 
