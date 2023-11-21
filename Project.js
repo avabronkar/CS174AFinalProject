@@ -129,7 +129,7 @@ export class Project extends Scene {
     checkCollisions(){
         for (let i = 0; i < this.platforms.length; i++) {
             const barrier = this.platforms[i];
-            if (Math.abs((barrier.base_transform.times(vec4(0, 0, 0, 1)).to3()[2])-(this.player_tranform.times(Mat4.translation(0, 0, this.player_depth)).times(vec4(0, 0, 0, 1)).to3()[2])) < 1 )
+            if ((Math.abs((barrier.base_transform.times(vec4(0, 0, 0, 1)).to3()[2])-(this.player_tranform.times(Mat4.translation(0, 0, this.player_depth)).times(vec4(0, 0, 0, 1)).to3()[2])) < 1 ) && this.platforms[i] === true)
             {
                 if ((barrier.barrier_angle * 180 / Math.PI) > 270)
                 {
@@ -138,12 +138,17 @@ export class Project extends Scene {
                         if (Math.abs((((this.player_angle * 180 / Math.PI) % 360) + 360) - (((barrier.barrier_angle * 180 / Math.PI)+90) % 360)) < 110)
                         {
                             console.log("Collision");
+                            console.log("Z value barrier", Math.abs((barrier.base_transform.times(vec4(0, 0, 0, 1)).to3()[2])));
+                            console.log("Z value player", (this.player_tranform.times(Mat4.translation(0, 0, this.player_depth)).times(vec4(0, 0, 0, 1)).to3()[2]));
+
                         }
                     }
                     else {
                         if (Math.abs(((this.player_angle * 180 / Math.PI) % 360) - (((barrier.barrier_angle * 180 / Math.PI)+90) % 360)) < 110)
                         {
                             console.log("Collision");
+                            console.log("Z value barrier", Math.abs((barrier.base_transform.times(vec4(0, 0, 0, 1)).to3()[2])));
+                            console.log("Z value player", (this.player_tranform.times(Mat4.translation(0, 0, this.player_depth)).times(vec4(0, 0, 0, 1)).to3()[2]));
                         }
                     }
                 }
@@ -152,12 +157,16 @@ export class Project extends Scene {
                         if (Math.abs((((this.player_angle * 180 / Math.PI) % 360) + 360) - ((barrier.barrier_angle * 180 / Math.PI)+90)) < 110)
                         {
                             console.log("Collision");
+                            console.log("Z value barrier", Math.abs((barrier.base_transform.times(vec4(0, 0, 0, 1)).to3()[2])));
+                            console.log("Z value player", (this.player_tranform.times(Mat4.translation(0, 0, this.player_depth)).times(vec4(0, 0, 0, 1)).to3()[2]));
                         }
                     }
                     else {
                         if (Math.abs(((this.player_angle * 180 / Math.PI) % 360) - ((barrier.barrier_angle * 180 / Math.PI)+90)) < 110)
                         {
                             console.log("Collision");
+                            console.log("Z value barrier", Math.abs((barrier.base_transform.times(vec4(0, 0, 0, 1)).to3()[2])));
+                            console.log("Z value player", (this.player_tranform.times(Mat4.translation(0, 0, this.player_depth)).times(vec4(0, 0, 0, 1)).to3()[2]));
                         }
                     }
                 }
@@ -218,7 +227,7 @@ export class Project extends Scene {
         this.platform(context, program_state);
         this.player(context, program_state);
         this.checkCollisions();
-        //console.log("Player Position Z:", this.player_tranform.times(Mat4.translation(0, 0, this.player_depth)).times(vec4(0, 0, 0, 1)).to3()[2]);
+        console.log("Player Position Z:", this.player_tranform.times(Mat4.translation(0, 0, this.player_depth)).times(vec4(0, 0, 0, 1)).to3()[2]);
 
         // if ((this.player_angle * 180 / Math.PI) < 0) {
         //     // If negative, add 360 to make it positive
