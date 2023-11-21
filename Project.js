@@ -52,6 +52,9 @@ export class Project extends Scene {
         this.player_depth = 0;
         this.player_height = 2;
         this.player_tranform = Mat4.identity().times(Mat4.translation(0, -this.platform_radius + this.player_height/2, 0));
+        this.player_angle = 0;
+
+        this.moving = 0; //-1 for left, 0 for none, 1 for right
 
         this.camera_position = Mat4.look_at(vec3(0, 0, -1), vec3(0, 0, 0), vec3(0, 1, 0));
 
@@ -61,20 +64,13 @@ export class Project extends Scene {
 
     make_control_panel() {
         // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
-        this.key_triggered_button("View solar system", ["Control", "0"], () => this.attached = () => null);
-        this.new_line();
-        this.key_triggered_button("Attach to planet 1", ["Control", "1"], () => this.attached = () => this.planet_1);
-        this.key_triggered_button("Attach to planet 2", ["Control", "2"], () => this.attached = () => this.planet_2);
-        this.new_line();
-        this.key_triggered_button("Attach to planet 3", ["Control", "3"], () => this.attached = () => this.planet_3);
-        this.key_triggered_button("Attach to planet 4", ["Control", "4"], () => this.attached = () => this.planet_4);
-        this.new_line();
-        this.key_triggered_button("Attach to moon", ["Control", "m"], () => this.attached = () => this.moon);
+        this.key_triggered_button("Move left", ["a"], () => this.moving = -1);
+        this.key_triggered_button("Stop", ["s"], () => this.moving = 0);
+        this.key_triggered_button("Move right", ["d"], () => this.moving = 1);
     }
 
     //draws platforms, deletes old and adds new.
     platform(context, program_state){
-        console.log(this.player_depth);
         if (this.platforms[0].start_pos + this.platform_length + 20 < this.player_depth){
             this.platforms.shift()
             this.platforms.push(new Platform(this.next_platform * this.platform_length, this.platform_length, this.platform_radius));
@@ -92,18 +88,18 @@ export class Project extends Scene {
             this.platforms[i].draw(context, program_state, this.shapes.tube, this.materials.test.override({color: (i + this.next_platform) % 2 === 0? red : purple}));
         }
 
-        console.log(this.platforms);
-
         /*;
         let model_transform = Mat4.translation(0, 0, 0).times(Mat4.scale(this.platform_radius, this.platform_radius, this.platform_length));
         this.shapes.tube.draw(context, program_state, model_transform, this.materials.test.override({color: yellow}));*/
     }
 
     //positions player based on depths and angle
-    player(context, program_state){
+    player(context, program_state)
+    {
+        this.player_angle -= this.moving * Math.PI / 180;
         this.player_depth = program_state.animation_time / 200 + this.player_depth_offset;
         let depth_transform = Mat4.translation(0, 0, this.player_depth);
-        this.shapes.sphere.draw(context, program_state, this.player_tranform.times(depth_transform), this.materials.player_material)
+        this.shapes.sphere.draw(context, program_state, Mat4.rotation(this.player_angle, 0, 0, 1).times(this.player_tranform).times(depth_transform), this.materials.player_material)
     }
 
     //camera setup such that it follows the player at an offset, light source from camera as well
