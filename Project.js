@@ -19,11 +19,13 @@ export class Platform{
         tube.draw(context, program_state, model_transform, mat);
 
 
-        if(this.barrier){
+        if(this.barrier) {
             const red = hex_color("#FF0000");
             let barrier_transform = Mat4.translation(this.radius, 0, this.start_pos + this.len / 2).times(Mat4.scale(this.radius, this.radius, 0.1));
             cube.draw(context, program_state, Mat4.rotation(this.barrier_angle, 0, 0, 1)
                 .times(barrier_transform), mat.override({color: red, diffusivity: 1, ambient: 0.2}));
+
+
         }
 
     }
@@ -124,6 +126,62 @@ export class Project extends Scene {
         program_state.set_camera(this.camera_position);
     }
 
+    checkCollisions(){
+        for (let i = 0; i < this.platforms.length; i++) {
+            const barrier = this.platforms[i];
+            if (Math.abs((barrier.base_transform.times(vec4(0, 0, 0, 1)).to3()[2])-(this.player_tranform.times(Mat4.translation(0, 0, this.player_depth)).times(vec4(0, 0, 0, 1)).to3()[2])) < 1 )
+            {
+                if ((barrier.barrier_angle * 180 / Math.PI) > 270)
+                {
+                    if ((this.player_angle * 180 / Math.PI) < 0)
+                    {
+                        if (Math.abs((((this.player_angle * 180 / Math.PI) % 360) + 360) - (((barrier.barrier_angle * 180 / Math.PI)+90) % 360)) < 110)
+                        {
+                            console.log("Collision");
+                        }
+                    }
+                    else {
+                        if (Math.abs(((this.player_angle * 180 / Math.PI) % 360) - (((barrier.barrier_angle * 180 / Math.PI)+90) % 360)) < 110)
+                        {
+                            console.log("Collision");
+                        }
+                    }
+                }
+                else {
+                    if ((this.player_angle * 180 / Math.PI) < 0) {
+                        if (Math.abs((((this.player_angle * 180 / Math.PI) % 360) + 360) - ((barrier.barrier_angle * 180 / Math.PI)+90)) < 110)
+                        {
+                            console.log("Collision");
+                        }
+                    }
+                    else {
+                        if (Math.abs(((this.player_angle * 180 / Math.PI) % 360) - ((barrier.barrier_angle * 180 / Math.PI)+90)) < 110)
+                        {
+                            console.log("Collision");
+                        }
+                    }
+                }
+
+            }
+            //}
+            // console.log("Barrier Position Z:", barrier.base_transform.times(vec4(0, 0, 0, 1)).to3()[2]);
+            // if ((barrier.barrier_angle * 180 / Math.PI) > 270){
+            //     console.log("Barrier Angle:", ((barrier.barrier_angle * 180 / Math.PI)+90) % 360);
+            // }
+            // else {
+            //     console.log("Barrier Angle:", (barrier.barrier_angle * 180 / Math.PI) + 90);
+            // }
+            // console.log("Player Position Z:", this.player_tranform.times(Mat4.translation(0, 0, this.player_depth)).times(vec4(0, 0, 0, 1)).to3()[2]);
+            // if ((this.player_angle * 180 / Math.PI) < 0) {
+            //     // If negative, add 360 to make it positive
+            //     console.log("Player Rotation Angle:", ((this.player_angle * 180 / Math.PI) % 360) + 360);
+            // } else {
+            //     // If positive, apply modulo 360
+            //     console.log("Player Rotation Angle:", (this.player_angle * 180 / Math.PI) % 360);
+            // }
+        }
+    }
+
     display(context, program_state) {
         // display():  Called once per frame of animation.
         // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
@@ -159,6 +217,17 @@ export class Project extends Scene {
         this.camera(context, program_state);
         this.platform(context, program_state);
         this.player(context, program_state);
+        this.checkCollisions();
+        //console.log("Player Position Z:", this.player_tranform.times(Mat4.translation(0, 0, this.player_depth)).times(vec4(0, 0, 0, 1)).to3()[2]);
+
+        // if ((this.player_angle * 180 / Math.PI) < 0) {
+        //     // If negative, add 360 to make it positive
+        //     console.log("Player Rotation Angle:", ((this.player_angle * 180 / Math.PI) % 360) + 360);
+        // } else {
+        //     // If positive, apply modulo 360
+        //     console.log("Player Rotation Angle:", (this.player_angle * 180 / Math.PI) % 360);
+        // }
+
 
     }
 }
