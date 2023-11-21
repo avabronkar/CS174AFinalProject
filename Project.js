@@ -5,16 +5,27 @@ const {
 } = tiny;
 
 export class Platform{
-    constructor(start_pos, length, radius) {
+    constructor(start_pos, length, radius, barrier= true) {
         this.start_pos = start_pos;
         this.base_transform = Mat4.translation(0, 0, this.start_pos + length / 2);
         this.len = length;
         this.radius = radius;
+        this.barrier = barrier;
+        this.barrier_angle = 2 * Math.PI * Math.random();
     }
 
-    draw(context, program_state, tube, mat){
+    draw(context, program_state, tube, cube, mat){
         let model_transform = this.base_transform.times(Mat4.scale(this.radius, this.radius, this.len));
         tube.draw(context, program_state, model_transform, mat);
+
+
+        if(this.barrier){
+            const red = hex_color("#FF0000");
+            let barrier_transform = Mat4.translation(this.radius, 0, this.start_pos + this.len / 2).times(Mat4.scale(this.radius, this.radius, 0.1));
+            cube.draw(context, program_state, Mat4.rotation(this.barrier_angle, 0, 0, 1)
+                .times(barrier_transform), mat.override({color: red, diffusivity: 1, ambient: 0.2}));
+        }
+
     }
 }
 
@@ -29,6 +40,7 @@ export class Project extends Scene {
             torus2: new defs.Torus(3, 15),
             sphere: new defs.Subdivision_Sphere(4),
             circle: new defs.Regular_2D_Polygon(1, 15),
+            cube: new (defs.Cube.prototype.make_flat_shaded_version()),
             tube: new defs.Cylindrical_Tube(10, 50, [[0, 2], [0, 1]]),
             // TODO:  Fill in as many additional shape instances as needed in this key/value table.
             //        (Requirement 1)
@@ -37,7 +49,7 @@ export class Project extends Scene {
         // *** Materials
         this.materials = {
             test: new Material(new defs.Phong_Shader(),
-                {ambient: 1, diffusivity: .6, color: hex_color("#ffffff")}),
+                {ambient: 1, specularity: 0, color: hex_color("#ffffff")}),
             player_material: new Material(new defs.Phong_Shader(),
                 {ambient: 0.4, diffusivity: .6, color: hex_color("#0000FF")}),
             // TODO:  Fill in as many additional material objects as needed in this key/value table.
@@ -64,9 +76,9 @@ export class Project extends Scene {
 
     make_control_panel() {
         // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
-        this.key_triggered_button("Move left", ["a"], () => this.moving = -1);
+        this.key_triggered_button("Move clockwise", ["a"], () => this.moving = -1);
         this.key_triggered_button("Stop", ["s"], () => this.moving = 0);
-        this.key_triggered_button("Move right", ["d"], () => this.moving = 1);
+        this.key_triggered_button("Move counter-clockwise", ["d"], () => this.moving = 1);
     }
 
     //draws platforms, deletes old and adds new.
@@ -85,7 +97,7 @@ export class Project extends Scene {
         });*/
 
         for (let i = 0; i < this.platforms.length; i++){
-            this.platforms[i].draw(context, program_state, this.shapes.tube, this.materials.test.override({color: (i + this.next_platform) % 2 === 0? red : purple}));
+            this.platforms[i].draw(context, program_state, this.shapes.tube, this.shapes.cube, this.materials.test.override({color: (i + this.next_platform) % 2 === 0? red : purple}));
         }
 
         /*;
@@ -122,9 +134,9 @@ export class Project extends Scene {
         }
 
         if (this.platforms.length < 2){
-            this.platforms.push(new Platform(this.next_platform * this.platform_length, this.platform_length, this.platform_radius));
+            this.platforms.push(new Platform(this.next_platform * this.platform_length, this.platform_length, this.platform_radius, false));
             this.next_platform += 1;
-            this.platforms.push(new Platform(this.next_platform * this.platform_length, this.platform_length, this.platform_radius));
+            this.platforms.push(new Platform(this.next_platform * this.platform_length, this.platform_length, this.platform_radius, false));
             this.next_platform += 1;
             this.platforms.push(new Platform(this.next_platform * this.platform_length, this.platform_length, this.platform_radius));
             this.next_platform += 1;
