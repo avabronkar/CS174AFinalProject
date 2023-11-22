@@ -74,6 +74,8 @@ export class Project extends Scene {
 
         this.platforms = [];
         this.next_platform = 0;
+
+        this.movement_speed = 3;
     }
 
     make_control_panel() {
@@ -110,7 +112,7 @@ export class Project extends Scene {
     //positions player based on depths and angle
     player(context, program_state)
     {
-        this.player_angle -= this.moving * Math.PI / 180;
+        this.player_angle -= this.moving * this.movement_speed * Math.PI / 180;
         this.player_depth = program_state.animation_time / 50 + this.player_depth_offset;
         let depth_transform = Mat4.translation(0, 0, this.player_depth);
         this.shapes.sphere.draw(context, program_state, Mat4.rotation(this.player_angle, 0, 0, 1).times(this.player_tranform).times(depth_transform), this.materials.player_material)
