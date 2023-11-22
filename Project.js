@@ -145,13 +145,21 @@ export class Project extends Scene {
                 {
                     if ((this.player_angle * 180 / Math.PI) < 0)
                     {
-                        if (Math.abs((((this.player_angle * 180 / Math.PI) % 360) + 360) - (((barrier.barrier_angle * 180 / Math.PI)+90) % 360)) < 110)
+                        if (Math.abs((((this.player_angle * 180 / Math.PI) % 360) + 360) - (((barrier.barrier_angle * 180 / Math.PI)+90) % 360)) < 100)
+                        {
+                            this.last_collision = program_state.animation_time;
+                        }
+                        if (Math.abs((((this.player_angle * 180 / Math.PI) % 360) + 360) - (((barrier.barrier_angle * 180 / Math.PI)+90) % 360)) > 260)
                         {
                             this.last_collision = program_state.animation_time;
                         }
                     }
                     else {
-                        if (Math.abs(((this.player_angle * 180 / Math.PI) % 360) - (((barrier.barrier_angle * 180 / Math.PI)+90) % 360)) < 110)
+                        if (Math.abs(((this.player_angle * 180 / Math.PI) % 360) - (((barrier.barrier_angle * 180 / Math.PI)+90) % 360)) < 100)
+                        {
+                            this.last_collision = program_state.animation_time;
+                        }
+                        if (Math.abs(((this.player_angle * 180 / Math.PI) % 360) - (((barrier.barrier_angle * 180 / Math.PI)+90) % 360)) > 260)
                         {
                             this.last_collision = program_state.animation_time;
                         }
@@ -159,13 +167,21 @@ export class Project extends Scene {
                 }
                 else {
                     if ((this.player_angle * 180 / Math.PI) < 0) {
-                        if (Math.abs((((this.player_angle * 180 / Math.PI) % 360) + 360) - ((barrier.barrier_angle * 180 / Math.PI)+90)) < 110)
+                        if (Math.abs((((this.player_angle * 180 / Math.PI) % 360) + 360) - ((barrier.barrier_angle * 180 / Math.PI)+90)) < 100)
+                        {
+                            this.last_collision = program_state.animation_time;
+                        }
+                        if (Math.abs((((this.player_angle * 180 / Math.PI) % 360) + 360) - ((barrier.barrier_angle * 180 / Math.PI)+90)) > 260)
                         {
                             this.last_collision = program_state.animation_time;
                         }
                     }
                     else {
-                        if (Math.abs(((this.player_angle * 180 / Math.PI) % 360) - ((barrier.barrier_angle * 180 / Math.PI)+90)) < 110)
+                        if (Math.abs(((this.player_angle * 180 / Math.PI) % 360) - ((barrier.barrier_angle * 180 / Math.PI)+90)) < 100)
+                        {
+                            this.last_collision = program_state.animation_time;
+                        }
+                        if (Math.abs(((this.player_angle * 180 / Math.PI) % 360) - ((barrier.barrier_angle * 180 / Math.PI)+90)) > 260)
                         {
                             this.last_collision = program_state.animation_time;
                         }
