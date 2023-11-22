@@ -76,6 +76,8 @@ export class Project extends Scene {
         this.next_platform = 0;
 
         this.movement_speed = 3;
+
+        this.last_collision = -10000;
     }
 
     make_control_panel() {
@@ -115,7 +117,13 @@ export class Project extends Scene {
         this.player_angle -= this.moving * this.movement_speed * Math.PI / 180;
         this.player_depth = program_state.animation_time / 50 + this.player_depth_offset;
         let depth_transform = Mat4.translation(0, 0, this.player_depth);
-        this.shapes.sphere.draw(context, program_state, Mat4.rotation(this.player_angle, 0, 0, 1).times(this.player_tranform).times(depth_transform), this.materials.player_material)
+
+        let normal = hex_color("#0000FF");
+        let hit = hex_color("#FFFF00");
+
+        this.shapes.sphere.draw(context, program_state, Mat4.rotation(this.player_angle, 0, 0, 1).times(this.player_tranform).times(depth_transform), this.materials.player_material.override({
+            color: program_state.animation_time - this.last_collision < 1000 ? hit : normal
+        }))
     }
 
     //camera setup such that it follows the player at an offset, light source from camera as well
@@ -128,7 +136,7 @@ export class Project extends Scene {
         program_state.set_camera(this.camera_position);
     }
 
-    checkCollisions(){
+    checkCollisions(program_state){
         for (let i = 0; i < this.platforms.length; i++) {
             const barrier = this.platforms[i];
             if ((Math.abs((barrier.base_transform.times(vec4(0, 0, 0, 1)).to3()[2])-(this.player_tranform.times(Mat4.translation(0, 0, this.player_depth)).times(vec4(0, 0, 0, 1)).to3()[2])) < 1 ))
@@ -139,13 +147,13 @@ export class Project extends Scene {
                     {
                         if (Math.abs((((this.player_angle * 180 / Math.PI) % 360) + 360) - (((barrier.barrier_angle * 180 / Math.PI)+90) % 360)) < 110)
                         {
-                            console.log("Collision");
+                            this.last_collision = program_state.animation_time;
                         }
                     }
                     else {
                         if (Math.abs(((this.player_angle * 180 / Math.PI) % 360) - (((barrier.barrier_angle * 180 / Math.PI)+90) % 360)) < 110)
                         {
-                            console.log("Collision");
+                            this.last_collision = program_state.animation_time;
                         }
                     }
                 }
@@ -153,13 +161,13 @@ export class Project extends Scene {
                     if ((this.player_angle * 180 / Math.PI) < 0) {
                         if (Math.abs((((this.player_angle * 180 / Math.PI) % 360) + 360) - ((barrier.barrier_angle * 180 / Math.PI)+90)) < 110)
                         {
-                            console.log("Collision");
+                            this.last_collision = program_state.animation_time;
                         }
                     }
                     else {
                         if (Math.abs(((this.player_angle * 180 / Math.PI) % 360) - ((barrier.barrier_angle * 180 / Math.PI)+90)) < 110)
                         {
-                            console.log("Collision");
+                            this.last_collision = program_state.animation_time;
                         }
                     }
                 }
@@ -219,7 +227,7 @@ export class Project extends Scene {
         this.camera(context, program_state);
         this.platform(context, program_state);
         this.player(context, program_state);
-        this.checkCollisions();
+        this.checkCollisions(program_state);
 
         // if ((this.player_angle * 180 / Math.PI) < 0) {
         //     // If negative, add 360 to make it positive
