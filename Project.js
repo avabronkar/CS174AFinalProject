@@ -139,6 +139,7 @@ export class Project extends Scene {
     checkCollisions(program_state){
         for (let i = 0; i < this.platforms.length; i++) {
             const barrier = this.platforms[i];
+            if (!barrier.barrier) return;
             if ((Math.abs((barrier.base_transform.times(vec4(0, 0, 0, 1)).to3()[2])-(this.player_tranform.times(Mat4.translation(0, 0, this.player_depth)).times(vec4(0, 0, 0, 1)).to3()[2])) < 1 ))
             {
                 if ((barrier.barrier_angle * 180 / Math.PI) > 270)
