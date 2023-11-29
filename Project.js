@@ -136,6 +136,7 @@ export class Project extends Scene {
         this.saved_animation_time = this.program_state.animation_time;
       else this.program_state.animation_time = this.saved_animation_time;
       this.paused = !this.paused;
+      this.moving = 0;
     });
   }
 
