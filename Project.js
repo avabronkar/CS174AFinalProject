@@ -15,7 +15,88 @@ const {
   Shape,
   Material,
   Scene,
+  Texture,
 } = tiny;
+
+const { Textured_Phong } = defs;
+
+// const Square = defs.Square =
+//     class Square extends Shape {
+//         // **Square** demonstrates two triangles that share vertices.  On any planar surface, the
+//         // interior edges don't make any important seams.  In these cases there's no reason not
+//         // to re-use data of the common vertices between triangles.  This makes all the vertex
+//         // arrays (position, normals, etc) smaller and more cache friendly.
+//         constructor() {
+//             super("position", "normal", "texture_coord");
+//             // Specify the 4 square corner locations, and match those up with normal vectors:
+//             this.arrays.position = Vector3.cast([-1, -1, 0], [1, -1, 0], [-1, 1, 0], [1, 1, 0]);
+//             this.arrays.normal = Vector3.cast([0, 0, 1], [0, 0, 1], [0, 0, 1], [0, 0, 1]);
+//             // Arrange the vertices into a square shape in texture space too:
+//             this.arrays.texture_coord = Vector.cast([0, 0], [1, 0], [0, 1], [1, 1]);
+//             // Use two triangles this time, indexing into four distinct vertices:
+//             this.indices.push(0, 1, 2, 1, 3, 2);
+//         }
+//     }
+
+class RectRatio {
+  extEuclid(x, y) {
+    while (y !== 0) {
+      const t = y;
+      y = x % y;
+      x = t;
+    }
+    return x;
+  }
+
+  constructor(divisor, dividend) {
+    this.divisor = divisor;
+    this.dividend = dividend;
+
+    this.gcd = this.extEuclid(this.divisor, this.dividend);
+    this.simplifiedDivisor = this.divisor / this.gcd;
+    this.simplifiedDividend = this.dividend / this.gcd;
+  }
+}
+
+class Rect extends defs.Square {
+  /**
+   * @param {RectRatio} ratio
+   * @param {Boolean} vertical
+   */
+  constructor(ratio, vertical) {
+    const simplifiedDivisor = ratio.simplifiedDivisor;
+    const simplifiedDividend = ratio.simplifiedDividend;
+
+    super("position", "normal", "texture_coord");
+
+    if (vertical) {
+      this.arrays.position = Vector3.cast(
+        [-simplifiedDivisor, -simplifiedDividend, 0],
+        [simplifiedDivisor, -simplifiedDividend, 0],
+        [-simplifiedDivisor, simplifiedDividend, 0],
+        [simplifiedDivisor, simplifiedDividend, 0],
+      );
+    } else {
+      this.arrays.position = Vector3.cast(
+        [-simplifiedDividend, -simplifiedDivisor, 0],
+        [simplifiedDividend, -simplifiedDivisor, 0],
+        [-simplifiedDividend, simplifiedDivisor, 0],
+        [simplifiedDividend, simplifiedDivisor, 0],
+      );
+    }
+
+    this.arrays.normal = Vector3.cast(
+      [0, 0, 1],
+      [0, 0, 1],
+      [0, 0, 1],
+      [0, 0, 1],
+    );
+    // Arrange the vertices into a square shape in texture space too:
+    this.arrays.texture_coord = Vector.cast([0, 0], [1, 0], [0, 1], [1, 1]);
+    // Use two triangles this time, indexing into four distinct vertices:
+    this.indices.push(0, 1, 2, 1, 3, 2);
+  }
+}
 
 export class Platform {
   constructor(start_pos, length, radius, barrier = true, paused) {
@@ -68,8 +149,8 @@ export class Project extends Scene {
         [0, 2],
         [0, 1],
       ]),
-      // TODO:  Fill in as many additional shape instances as needed in this key/value table.
-      //        (Requirement 1)
+      rect: new Rect(new RectRatio(1, 2), false),
+      square: new Rect(new RectRatio(1, 1), false),
     };
 
     // *** Materials
@@ -79,13 +160,62 @@ export class Project extends Scene {
         specularity: 0,
         color: hex_color("#ffffff"),
       }),
+      test2: new Material(new defs.Basic_Shader(), {
+        color: hex_color("#ffffff"),
+      }),
       player_material: new Material(new defs.Phong_Shader(), {
-        ambient: 0.4,
-        diffusivity: 0.6,
+        ambient: 1,
+        diffusivity: 0,
         color: hex_color("#0000FF"),
       }),
       // TODO:  Fill in as many additional material objects as needed in this key/value table.
       //        (Requirement 4)
+      rect: new Material(new defs.Phong_Shader(), {
+        ambient: 1,
+        diffusivity: 0,
+        color: hex_color("#f55fff"),
+      }),
+      start_screen: new Material(new Textured_Phong(), {
+        color: hex_color("#000000"),
+        ambient: 1,
+        texture: new Texture("assets/start-screen-flipped.png"),
+      }),
+      lose_screen: new Material(new Textured_Phong(), {
+        color: hex_color("#000000"),
+        ambient: 1,
+        texture: new Texture("assets/lose-screen-flipped.png"),
+      }),
+      player_anim1: new Material(new Textured_Phong(), {
+        color: hex_color("#000000"),
+        ambient: 1,
+        texture: new Texture("assets/player-anim1.png"),
+      }),
+      player_anim2: new Material(new Textured_Phong(), {
+        color: hex_color("#000000"),
+        ambient: 1,
+        texture: new Texture("assets/player-anim2.png"),
+      }),
+      player_anim3: new Material(new Textured_Phong(), {
+        color: hex_color("#000000"),
+        ambient: 1,
+        texture: new Texture("assets/player-anim3.png"),
+      }),
+      player_anim4: new Material(new Textured_Phong(), {
+        color: hex_color("#000000"),
+        ambient: 1,
+        texture: new Texture("assets/player-anim4.png"),
+      }),
+    };
+
+    this.colors = {
+      white: hex_color("#ffffff"),
+      black: hex_color("#000000"),
+      brick1: hex_color("#8D4F3A"),
+      brick2: hex_color("#a86032"),
+      brick3: hex_color("#6e3f2f"),
+      brick4: hex_color("#8a8583"),
+      brick5: hex_color("#8f8581"),
+      brick6: hex_color("#82807f"),
     };
 
     this.platform_radius = 5;
@@ -101,6 +231,10 @@ export class Project extends Scene {
     this.player_angle = 0;
 
     this.moving = 0; //-1 for left, 0 for none, 1 for right
+
+    this.gameActive = false;
+    this.lost = false;
+
     this.paused = false;
     this.saved_animation_time = 0;
 
@@ -125,7 +259,10 @@ export class Project extends Scene {
       ["a"],
       () => (this.moving = -1),
     );
-    this.key_triggered_button("Stop", ["s"], () => (this.moving = 0));
+    this.key_triggered_button("Start", ["s"], () => {
+      if (!this.gameActive) this.program_state.animation_time = 0;
+      this.gameActive = true;
+    });
     this.key_triggered_button(
       "Move counter-clockwise",
       ["d"],
@@ -190,22 +327,44 @@ export class Project extends Scene {
 
     let depth_transform = Mat4.translation(0, 0, this.player_depth);
 
-    let normal = hex_color("#0000FF");
-    let hit = hex_color("#FFFF00");
-
-    this.shapes.sphere.draw(
-      context,
-      program_state,
-      Mat4.rotation(this.player_angle, 0, 0, 1)
-        .times(this.player_transform)
-        .times(depth_transform),
-      this.materials.player_material.override({
-        color:
-          program_state.animation_time - this.last_collision < 1000
-            ? hit
-            : normal,
-      }),
-    );
+    const num = Math.floor(this.program_state.animation_time % 4);
+    if (num === 0) {
+      this.shapes.square.draw(
+        context,
+        program_state,
+        Mat4.rotation(this.player_angle, 0, 0, 1)
+          .times(this.player_transform)
+          .times(depth_transform),
+        this.materials.player_anim4,
+      );
+    } else if (num === 1) {
+      this.shapes.square.draw(
+        context,
+        program_state,
+        Mat4.rotation(this.player_angle, 0, 0, 1)
+          .times(this.player_transform)
+          .times(depth_transform),
+        this.materials.player_anim3,
+      );
+    } else if (num === 2) {
+      this.shapes.square.draw(
+        context,
+        program_state,
+        Mat4.rotation(this.player_angle, 0, 0, 1)
+          .times(this.player_transform)
+          .times(depth_transform),
+        this.materials.player_anim2,
+      );
+    } else {
+      this.shapes.square.draw(
+        context,
+        program_state,
+        Mat4.rotation(this.player_angle, 0, 0, 1)
+          .times(this.player_transform)
+          .times(depth_transform),
+        this.materials.player_anim1,
+      );
+    }
   }
 
   //camera setup such that it follows the player at an offset, light source from camera as well
@@ -311,23 +470,26 @@ export class Project extends Scene {
           }
         }
       }
-      //}
-      // console.log("Barrier Position Z:", barrier.base_transform.times(vec4(0, 0, 0, 1)).to3()[2]);
-      // if ((barrier.barrier_angle * 180 / Math.PI) > 270){
-      //     console.log("Barrier Angle:", ((barrier.barrier_angle * 180 / Math.PI)+90) % 360);
-      // }
-      // else {
-      //     console.log("Barrier Angle:", (barrier.barrier_angle * 180 / Math.PI) + 90);
-      // }
-      // console.log("Player Position Z:", this.player_tranform.times(Mat4.translation(0, 0, this.player_depth)).times(vec4(0, 0, 0, 1)).to3()[2]);
-      // if ((this.player_angle * 180 / Math.PI) < 0) {
-      //     // If negative, add 360 to make it positive
-      //     console.log("Player Rotation Angle:", ((this.player_angle * 180 / Math.PI) % 360) + 360);
-      // } else {
-      //     // If positive, apply modulo 360
-      //     console.log("Player Rotation Angle:", (this.player_angle * 180 / Math.PI) % 360);
-      // }
     }
+  }
+
+  showStartScreen(context, program_state) {
+    this.shapes.square.draw(
+      context,
+      program_state,
+      Mat4.translation(0, 0, -13),
+      this.materials.start_screen,
+    );
+  }
+
+  showLoseScreen(context, program_state) {
+    let depth_transform = Mat4.translation(0, 0, this.player_depth - 12);
+    this.shapes.square.draw(
+      context,
+      program_state,
+      depth_transform,
+      this.materials.lose_screen,
+    );
   }
 
   display(context, program_state) {
@@ -392,10 +554,22 @@ export class Project extends Scene {
       dt = program_state.animation_delta_time / 1000;
 
     this.program_state = program_state;
+
     this.camera(context, program_state);
-    this.platform(context, program_state);
-    this.player(context, program_state);
-    this.checkCollisions(program_state);
+
+    if (this.last_collision > 0) {
+      this.lost = true;
+    }
+
+    if (this.gameActive && !this.lost) {
+      this.platform(context, program_state);
+      this.player(context, program_state);
+      this.checkCollisions(program_state);
+    } else if (this.lost) {
+      this.showLoseScreen(context, program_state);
+    } else {
+      this.showStartScreen(context, program_state);
+    }
 
     // if ((this.player_angle * 180 / Math.PI) < 0) {
     //     // If negative, add 360 to make it positive
