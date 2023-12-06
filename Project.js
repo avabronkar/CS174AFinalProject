@@ -20,24 +20,6 @@ const {
 
 const { Textured_Phong } = defs;
 
-// const Square = defs.Square =
-//     class Square extends Shape {
-//         // **Square** demonstrates two triangles that share vertices.  On any planar surface, the
-//         // interior edges don't make any important seams.  In these cases there's no reason not
-//         // to re-use data of the common vertices between triangles.  This makes all the vertex
-//         // arrays (position, normals, etc) smaller and more cache friendly.
-//         constructor() {
-//             super("position", "normal", "texture_coord");
-//             // Specify the 4 square corner locations, and match those up with normal vectors:
-//             this.arrays.position = Vector3.cast([-1, -1, 0], [1, -1, 0], [-1, 1, 0], [1, 1, 0]);
-//             this.arrays.normal = Vector3.cast([0, 0, 1], [0, 0, 1], [0, 0, 1], [0, 0, 1]);
-//             // Arrange the vertices into a square shape in texture space too:
-//             this.arrays.texture_coord = Vector.cast([0, 0], [1, 0], [0, 1], [1, 1]);
-//             // Use two triangles this time, indexing into four distinct vertices:
-//             this.indices.push(0, 1, 2, 1, 3, 2);
-//         }
-//     }
-
 class RectRatio {
   extEuclid(x, y) {
     while (y !== 0) {
@@ -151,6 +133,7 @@ export class Project extends Scene {
       ]),
       rect: new Rect(new RectRatio(1, 2), false),
       square: new Rect(new RectRatio(1, 1), false),
+      coin: new defs.Torus(50, 50),
     };
 
     // *** Materials
@@ -205,6 +188,10 @@ export class Project extends Scene {
         ambient: 1,
         texture: new Texture("assets/player-anim4.png"),
       }),
+      coin: new Material(new defs.Phong_Shader(), {
+        color: hex_color("#D9A400"),
+        ambient: 1,
+      }),
     };
 
     this.colors = {
@@ -247,7 +234,7 @@ export class Project extends Scene {
     this.platforms = [];
     this.next_platform = 0;
 
-    this.movement_speed = 3;
+    this.movement_speed = 2;
 
     this.last_collision = -10000;
   }
@@ -570,13 +557,14 @@ export class Project extends Scene {
     } else {
       this.showStartScreen(context, program_state);
     }
-
-    // if ((this.player_angle * 180 / Math.PI) < 0) {
-    //     // If negative, add 360 to make it positive
-    //     console.log("Player Rotation Angle:", ((this.player_angle * 180 / Math.PI) % 360) + 360);
-    // } else {
-    //     // If positive, apply modulo 360
-    //     console.log("Player Rotation Angle:", (this.player_angle * 180 / Math.PI) % 360);
-    // }
+    
+    //
+    // const angle = Math.cos(0.005 * this.program_state.animation_time) ;
+    // this.shapes.coin.draw(
+    //   context,
+    //   program_state,
+    //   Mat4.identity().times(Mat4.rotation( 2 * angle,0, 1, 0)),
+    //   this.materials.coin,
+    // );
   }
 }
