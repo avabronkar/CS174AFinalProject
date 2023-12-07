@@ -525,7 +525,7 @@ export class Project extends Scene {
 
     // TODO:  Fill in matrix operations and drawing code to draw the solar system scene (Requirements 3 and 4)
     const t = program_state.animation_time / 1000,
-      dt = program_state.animation_delta_time / 1000;
+      dt  = program_state.animation_delta_time / 1000;
 
     this.program_state = program_state;
     this.camera(context, program_state);
