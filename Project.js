@@ -241,18 +241,19 @@ export class Project extends Scene {
 
   make_control_panel() {
     // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
-    this.key_triggered_button(
-      "Move clockwise",
-      ["a"],
-      () => (this.moving = -1),
-    );
-    this.key_triggered_button("Start", ["s"], () => {
+
+    this.key_triggered_button("Start Game", ["g"], () => {
       if (!this.gameActive) this.program_state.animation_time = 0;
       this.gameActive = true;
     });
     this.key_triggered_button(
-      "Move counter-clockwise",
-      ["d"],
+        "Move Left",
+        ["d"],
+        () => (this.moving = -1),
+      );
+    this.key_triggered_button(
+      "Move Right",
+      ["a"],
       () => (this.moving = 1),
     );
     this.key_triggered_button("Pause", ["p"], () => {
