@@ -32,9 +32,10 @@ export class Platform {
     //this.score_display = new Text_Line(10);
     this.score = 0;
     this.lastCollisionValue = 0;
+    this.coin = true;
   }
 
-  draw(context, program_state, tube, cube, mat, barrier_mat) {
+  draw(context, program_state, tube, cube, coin, mat, barrier_mat, coin_mat) {
     let model_transform = this.base_transform.times(
       Mat4.scale(this.radius, this.radius, this.len),
     );
@@ -42,7 +43,6 @@ export class Platform {
 
     if (this.barrier) {
       const red = hex_color("#FF0000");
-      const gold = hex_color("#FFD700");
       let barrier_transform = Mat4.translation(
         this.radius,
         0,
@@ -55,14 +55,15 @@ export class Platform {
           barrier_mat.override({ color: red, diffusivity: 1, ambient: 0.2 }),
       );
 
-      const coin_transform = Mat4.translation(this.radius, 0, this.start_pos + this.len/2 + 25,)
-          .times(Mat4.scale(this.radius /5, this.radius/10, 0.5));
-      cube.draw(
-          context,
-          program_state,
-          Mat4.rotation(this.coin_angle, 0, 0, 1).times(coin_transform),
-          mat.override({ color: gold, diffusivity: 1, ambient: 0.2 }),
-      )
+      const coin_transform = Mat4.translation(this.radius - 1.5, 0, this.start_pos + this.len/2 + 25,)
+          .times(Mat4.scale(this.radius /5, this.radius/5, 0.1));
+      if (this.coin)
+        coin.draw(
+            context,
+            program_state,
+            Mat4.rotation(this.coin_angle, 0, 0, 1).times(coin_transform),
+            coin_mat,
+        )
 
     }
 
@@ -120,6 +121,11 @@ export class Project extends Scene {
         specularity: 0,
         color: hex_color("#A9A9A9"),
         texture: new Texture("assets/chain.png")
+      }),
+      coin:  new Material(new defs.Textured_Phong(), {
+        ambient: 1,
+        specularity: 0,
+        texture: new Texture("assets/coin.png")
       }),
       player_material: new Material(new defs.Phong_Shader(), {
         ambient: 0.4,
@@ -213,10 +219,11 @@ export class Project extends Scene {
         this.shapes.tube,
         this.shapes.cube,
         //this.shapes.sphere,
-        //this.shapes.coin,
+        this.shapes.coin,
         this.materials.pipe,
             //.override({ color: (i + this.next_platform) % 2 === 0 ? red : purple, }),
-        this.materials.chain
+        this.materials.chain,
+          this.materials.coin
       );
     }
 
@@ -399,6 +406,7 @@ export class Project extends Scene {
               if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
                 this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
                 this.score = this.score + 1;
+                barrier.coin = false;
               }
               console.log("score: ", this.score);
             }
@@ -415,6 +423,7 @@ export class Project extends Scene {
               if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
                 this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
                 this.score = this.score + 1;
+                barrier.coin = false;
               }
               console.log("score: ", this.score);
             }
@@ -431,6 +440,7 @@ export class Project extends Scene {
               if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
                 this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
                 this.score = this.score + 1;
+                barrier.coin = false;
               }
               console.log("score: ", this.score);
             }
@@ -446,6 +456,7 @@ export class Project extends Scene {
               if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
                 this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
                 this.score = this.score + 1;
+                barrier.coin = false;
               }
               console.log("score: ", this.score);
             }
@@ -465,6 +476,7 @@ export class Project extends Scene {
               if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
                 this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
                 this.score = this.score + 1;
+                barrier.coin = false;
               }
               console.log("score: ", this.score);
             }
@@ -481,6 +493,7 @@ export class Project extends Scene {
               if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
                 this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
                 this.score = this.score + 1;
+                barrier.coin = false;
               }
               console.log("score: ", this.score);
             }
@@ -497,6 +510,7 @@ export class Project extends Scene {
               if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
                 this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
                 this.score = this.score + 1;
+                barrier.coin = false;
               }
               console.log("score: ", this.score);
             }
@@ -512,6 +526,7 @@ export class Project extends Scene {
               if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
                 this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
                 this.score = this.score + 1;
+                barrier.coin = false;
               }
               console.log("score: ", this.score);
             }
