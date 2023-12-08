@@ -56,7 +56,7 @@ export class Platform {
       );
 
       const coin_transform = Mat4.translation(this.radius - 1.5, 0, this.start_pos + this.len/2 + 25,)
-          .times(Mat4.scale(this.radius /5, this.radius/5, 0.1));
+          .times(Mat4.scale(this.radius / 8, this.radius/ 8, 0.1));
       if (this.coin)
         coin.draw(
             context,
