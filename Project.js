@@ -142,10 +142,24 @@ export class Platform {
   }
 }
 
+class Player{
+  draw(context, program_state, player_transform, sphere, cube, player_mat){
+    sphere.draw(
+        context,
+        program_state,
+        player_transform.times(Mat4.scale(0.5, 0.5, 0.5)).times(Mat4.translation(0, 2, 0)),
+        player_mat
+    );
+  }
+}
 export class Project extends Scene {
   constructor() {
     // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
     super();
+    this.init()
+  }
+
+  init(){
     this.program_state = null;
 
     // At the beginning of our program, load one of each of these shape definitions onto the GPU.
@@ -164,8 +178,7 @@ export class Project extends Scene {
         [0, 1],
       ]),
       rect: new Rect(new RectRatio(1, 2), false),
-      square: new Rect(new RectRatio(1, 1), false),
-      
+
     };
 
     this.score = 0;
@@ -344,7 +357,11 @@ export class Project extends Scene {
     this.movement_speed = 1;
 
     this.last_collision = -10000;
+
+    this.character = new Player();
   }
+
+
 
   make_control_panel() {
     // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
@@ -352,6 +369,14 @@ export class Project extends Scene {
     if (!this.gameActive) this.program_state.animation_time = 0;
       this.gameActive = true;
     });
+
+    this.key_triggered_button( "restart", ["r"], () => {
+      if (this.lost){
+        this.init();
+        this.program_state.animation_time = 0;
+      }
+    });
+
     this.key_triggered_button(
       "Move Left",
       ["a"],
@@ -430,19 +455,23 @@ export class Project extends Scene {
     let normal = hex_color("#0000FF");
     let hit = hex_color("#FFFF00");
 
-    this.shapes.sphere.draw(
-      context,
-      program_state,
-      Mat4.rotation(this.player_angle, 0, 0, 1)
-        .times(this.player_transform)
-        .times(depth_transform),
-      this.materials.player_material.override({
-        color:
-          program_state.animation_time - this.last_collision < 1000
-            ? hit
-            : normal,
-      }),
-    );
+    this.character.draw(
+        context,
+        program_state,
+        Mat4.rotation(this.player_angle, 0, 0, 1)
+            .times(this.player_transform)
+            .times(depth_transform),
+        this.shapes.sphere,
+        this.shapes.cube,
+        this.materials.player_material.override({
+          color:
+              program_state.animation_time - this.last_collision < 1000
+                  ? hit
+                  : normal,
+        }),
+    )
+
+
   }
 
   //camera setup such that it follows the player at an offset, light source from camera as well
@@ -456,17 +485,19 @@ export class Project extends Scene {
     this.camera_position = Mat4.look_at(eye.to3(), at.to3(), up.to3());
     program_state.set_camera(this.camera_position);
 
-    this.shapes.square.draw(context, program_state, Mat4.translation(0.63, 0.3, 1).times(this.camera_position).times(Mat4.scale(0.1, 0.1, 1)), this.materials.SCORE_TEXT);
+    if (this.gameActive) {
+      this.shapes.square.draw(context, program_state, Mat4.translation(0.63, 0.3, 1).times(this.camera_position).times(Mat4.scale(0.1, 0.1, 1)), this.materials.SCORE_TEXT);
 
 
-    let str = this.score.toString()
+      let str = this.score.toString()
 
-    let delX = 0;
+      let delX = 0;
 
-    for (let i = 0; i < str.length; i++){
-      let num = parseInt(str[i])
-      this.shapes.square.draw(context, program_state, Mat4.translation(delX + this.offsets[num], 0.38, 1).times(this.camera_position).times(Mat4.scale(0.02, 0.02, 1)), this.materials[num]);
-      delX -= this.widths[num];
+      for (let i = 0; i < str.length; i++) {
+        let num = parseInt(str[i])
+        this.shapes.square.draw(context, program_state, Mat4.translation(delX + this.offsets[num], 0.38, 1).times(this.camera_position).times(Mat4.scale(0.02, 0.02, 1)), this.materials[num]);
+        delX -= this.widths[num];
+      }
     }
 
 
