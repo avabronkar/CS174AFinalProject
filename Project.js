@@ -127,18 +127,7 @@ export class Platform {
             Mat4.rotation(this.coin_angle, 0, 0, 1).times(coin_transform),
             coin_mat,
         )
-
     }
-
-
-// this.shapes.coin.draw(
-//   context,
-//   program_state,
-//   Mat4.identity().times(Mat4.rotation( 2 * angle,0, 1, 0)),
-//   this.materials.coin,
-// );
-// 
-
   }
 }
 
