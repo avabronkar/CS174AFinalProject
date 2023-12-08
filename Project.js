@@ -142,11 +142,24 @@ export class Platform {
   }
 }
 
+class Player{
+  draw(context, program_state, player_transform, sphere, cube, player_mat){
+    sphere.draw(
+        context,
+        program_state,
+        player_transform,//.times(Mat4.scale(0.5, 0.5, 0.5)).times(Mat4.translation(0, 2, 0)),
+        player_mat
+    );
+  }
+}
 export class Project extends Scene {
   constructor() {
     // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
     super();
-    this.program_state = null;
+    this.init()
+  }
+
+  init(){
 
     // At the beginning of our program, load one of each of these shape definitions onto the GPU.
     this.shapes = {
@@ -164,8 +177,7 @@ export class Project extends Scene {
         [0, 1],
       ]),
       rect: new Rect(new RectRatio(1, 2), false),
-      square: new Rect(new RectRatio(1, 1), false),
-      
+
     };
 
     this.score = 0;
@@ -342,7 +354,7 @@ export class Project extends Scene {
     );
     this.player_angle = 0;
 
-    
+    this.lastCollisionValue = 0;
 
     this.moving = 0; //-1 for left, 0 for none, 1 for right
 
@@ -364,7 +376,11 @@ export class Project extends Scene {
     this.movement_speed = 1;
 
     this.last_collision = -10000;
+
+    this.character = new Player();
   }
+
+
 
   make_control_panel() {
     // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
@@ -372,10 +388,16 @@ export class Project extends Scene {
     if (!this.gameActive) this.program_state.animation_time = 0;
       this.gameActive = true;
     });
+    this.key_triggered_button( "restart", ["r"], () => {
+      if (this.lost){
+        this.init();
+        this.program_state.animation_time = 0;
+      }
+    });
+
     this.key_triggered_button( "Move Left", ["a"], () => {
        if(!this.paused) this.moving = -1;
-    }
-    );
+    });
     this.key_triggered_button("Stop", ["s"], () => (this.moving = 0));
     this.key_triggered_button("Move Right", ["d"], () => {
         if(!this.paused) this.moving = 1;
@@ -495,17 +517,19 @@ export class Project extends Scene {
     this.camera_position = Mat4.look_at(eye.to3(), at.to3(), up.to3());
     program_state.set_camera(this.camera_position);
 
-    this.shapes.square.draw(context, program_state, Mat4.translation(0.63, 0.3, 1).times(this.camera_position).times(Mat4.scale(0.1, 0.1, 1)), this.materials.SCORE_TEXT);
+    if (this.gameActive) {
+      this.shapes.square.draw(context, program_state, Mat4.translation(0.63, 0.3, 1).times(this.camera_position).times(Mat4.scale(0.1, 0.1, 1)), this.materials.SCORE_TEXT);
 
 
-    let str = this.score.toString()
+      let str = this.score.toString()
 
-    let delX = 0;
+      let delX = 0;
 
-    for (let i = 0; i < str.length; i++){
-      let num = parseInt(str[i])
-      this.shapes.square.draw(context, program_state, Mat4.translation(delX + this.offsets[num], 0.38, 1).times(this.camera_position).times(Mat4.scale(0.02, 0.02, 1)), this.materials[num]);
-      delX -= this.widths[num];
+      for (let i = 0; i < str.length; i++) {
+        let num = parseInt(str[i])
+        this.shapes.square.draw(context, program_state, Mat4.translation(delX + this.offsets[num], 0.38, 1).times(this.camera_position).times(Mat4.scale(0.02, 0.02, 1)), this.materials[num]);
+        delX -= this.widths[num];
+      }
     }
 
 
@@ -635,7 +659,7 @@ export class Project extends Scene {
                     (((this.player_angle * 180) / Math.PI) % 360) +
                     360 -
                     (((barrier.coin_angle * 180) / Math.PI + 90) % 360),
-                ) < 10
+                ) < 20
             ) {
               // console.log("player angle:", ((((this.player_angle * 180) / Math.PI) % 360) + 360));
               // console.log("coin angle", (((barrier.coin_angle * 180) / Math.PI + 90) % 360));
@@ -653,7 +677,7 @@ export class Project extends Scene {
                     (((this.player_angle * 180) / Math.PI) % 360) +
                     360 -
                     (((barrier.coin_angle * 180) / Math.PI + 90) % 360),
-                ) > 350
+                ) > 340
             ) {
               // console.log("player angle: ", (((this.player_angle * 180) / Math.PI) % 360) + 360);
               // console.log("coin angle", (((barrier.coin_angle * 180) / Math.PI + 90) % 360));
@@ -670,7 +694,7 @@ export class Project extends Scene {
                 Math.abs(
                     (((this.player_angle * 180) / Math.PI) % 360) -
                     (((barrier.coin_angle * 180) / Math.PI + 90) % 360),
-                ) < 10
+                ) < 20
             ) {
               // console.log("player angle:", (((this.player_angle * 180) / Math.PI) % 360));
               // console.log("coin angle:", (((barrier.coin_angle * 180) / Math.PI + 90) % 360));
@@ -686,7 +710,7 @@ export class Project extends Scene {
                 Math.abs(
                     (((this.player_angle * 180) / Math.PI) % 360) -
                     (((barrier.coin_angle * 180) / Math.PI + 90) % 360),
-                ) > 350
+                ) > 340
             ) {
               // console.log("player angle:", ((this.player_angle * 180) / Math.PI) % 360);
               // console.log("coin angle:", (((barrier.coin_angle * 180) / Math.PI + 90) % 360));
@@ -706,7 +730,7 @@ export class Project extends Scene {
                     (((this.player_angle * 180) / Math.PI) % 360) +
                     360 -
                     ((barrier.coin_angle * 180) / Math.PI + 90),
-                ) < 10
+                ) < 20
             ) {
               // console.log("player angle", (((this.player_angle * 180) / Math.PI) % 360)+360);
               // console.log("coin angle: ", ((barrier.coin_angle * 180) / Math.PI + 90));
@@ -723,7 +747,7 @@ export class Project extends Scene {
                     (((this.player_angle * 180) / Math.PI) % 360) +
                     360 -
                     ((barrier.coin_angle * 180) / Math.PI + 90),
-                ) > 350
+                ) > 340
             ) {
               // console.log("player angle:", ((((this.player_angle * 180) / Math.PI) % 360) + 360));
               // console.log("coin angle:", ((barrier.coin_angle * 180) / Math.PI + 90));
@@ -740,7 +764,7 @@ export class Project extends Scene {
                 Math.abs(
                     (((this.player_angle * 180) / Math.PI) % 360) -
                     ((barrier.coin_angle * 180) / Math.PI + 90),
-                ) < 10
+                ) < 20
             ) {
               // console.log("player angle", (((this.player_angle * 180) / Math.PI) % 360));
               // console.log("coin angle", ((barrier.coin_angle * 180) / Math.PI + 90));
@@ -756,7 +780,7 @@ export class Project extends Scene {
                 Math.abs(
                     (((this.player_angle * 180) / Math.PI) % 360) -
                     ((barrier.coin_angle * 180) / Math.PI + 90),
-                ) > 350
+                ) > 340
             ) {
               // console.log("player angle: ", (((this.player_angle * 180) / Math.PI) % 360));
               // console.log("coin angle: ", ((barrier.coin_angle * 180) / Math.PI + 90));
