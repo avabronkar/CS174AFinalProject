@@ -221,6 +221,7 @@ export class Project extends Scene {
 
     this.gameActive = false;
     this.lost = false;
+    this.restart = false;
 
     this.paused = false;
     this.saved_animation_time = 0;
@@ -241,26 +242,32 @@ export class Project extends Scene {
 
   make_control_panel() {
     // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
-
-    this.key_triggered_button("Start Game", ["g"], () => {
+    this.key_triggered_button("Start", ["g"], () => {
       if (!this.gameActive) this.program_state.animation_time = 0;
       this.gameActive = true;
     });
-    this.key_triggered_button(
-        "Move Left",
-        ["d"],
-        () => (this.moving = -1),
-      );
-    this.key_triggered_button(
-      "Move Right",
-      ["a"],
-      () => (this.moving = 1),
-    );
+    this.key_triggered_button( "Move Left", ["d"], () => {
+        if (!this.paused) this.moving = 1;
+        else this.moving = 0;
+    });
+    this.key_triggered_button( "Move Right", ["a"], () => {
+        if (!this.paused) this.moving = -1;
+        else this.moving = 0;
+    });
     this.key_triggered_button("Pause", ["p"], () => {
       if (!this.paused)
         this.saved_animation_time = this.program_state.animation_time;
       else this.program_state.animation_time = this.saved_animation_time;
       this.paused = !this.paused;
+      this.moving = 0;
+    });
+    this.key_triggered_button("Restart Game", ["r"], () => {
+        this.program_state.animation_time = 0;
+        // this.player_depth = 0;
+        // this.lost = !this.lost;
+        this.gameActive = !this.gameActive;
+        this.restart = true;
+        console.log("Restart");
     });
   }
 
@@ -281,8 +288,8 @@ export class Project extends Scene {
       this.next_platform += 1;
     }
 
-    const red = hex_color("#FF7276");
-    const purple = hex_color("#800080");
+    const red = hex_color("#8D4F3A");
+    const purple = hex_color("#a86032");
 
     /*this.platforms.forEach(function (el){
             el.draw(context, program_state, this.shapes.tube, this.materials.test.override({color: yellow}));
@@ -313,9 +320,10 @@ export class Project extends Scene {
       ? this.saved_animation_time / 50 + this.player_depth_offset
       : this.program_state.animation_time / 50 + this.player_depth_offset;
 
+
     let depth_transform = Mat4.translation(0, 0, this.player_depth);
 
-    const num = Math.floor(this.program_state.animation_time % 4);
+    const num = this.paused ? 4: Math.floor(this.program_state.animation_time % 4);
     if (num === 0) {
       this.shapes.square.draw(
         context,
@@ -470,6 +478,7 @@ export class Project extends Scene {
     );
   }
 
+
   showLoseScreen(context, program_state) {
     let depth_transform = Mat4.translation(0, 0, this.player_depth - 12);
     this.shapes.square.draw(
@@ -479,6 +488,7 @@ export class Project extends Scene {
       this.materials.lose_screen,
     );
   }
+
 
   display(context, program_state) {
     // display():  Called once per frame of animation.
@@ -553,11 +563,21 @@ export class Project extends Scene {
       this.platform(context, program_state);
       this.player(context, program_state);
       this.checkCollisions(program_state);
+    } else if (/*!this.lost && !this.gameActive && */this.restart) {
+        if (!this.lost  && this.gameActive) {
+            this.program_state_animation_time = 0;
+            console.log("RESTART THE DAMN GAME - begin again");
+        }
+        this.showStartScreen(context, program_state);
+        this.program_state_animation_time = 0;
+        console.log("RESTART THE DAMN GAME -- lost game");
     } else if (this.lost) {
-      this.showLoseScreen(context, program_state);
+        this.showLoseScreen(context, program_state);
+        console.log("GAME OVER");
     } else {
       this.showStartScreen(context, program_state);
-    }
+      //gthis.gameActive = !this.gameActive;
+    } 
     
     //
     // const angle = Math.cos(0.005 * this.program_state.animation_time) ;
