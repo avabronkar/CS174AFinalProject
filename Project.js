@@ -1,4 +1,5 @@
 import { defs, tiny } from "./examples/common.js";
+import { Text_Line } from "./examples/text-demo.js";
 
 const {
   Vector,
@@ -18,7 +19,7 @@ const {
 } = tiny;
 
 export class Platform {
-  constructor(start_pos, length, radius, barrier = true, paused) {
+  constructor(start_pos, length, radius, barrier = true, paused, score) {
     this.start_pos = start_pos;
     this.base_transform = Mat4.translation(0, 0, this.start_pos + length / 2);
     this.len = length;
@@ -27,7 +28,9 @@ export class Platform {
     this.barrier_angle = 2 * Math.PI * Math.random();
     this.coin_angle = 2 * Math.PI * Math.random();
     this.paused = paused;
+    //this.score_display = new Text_Line(10);
     this.score = 0;
+    this.lastCollisionValue = 0;
   }
 
   draw(context, program_state, tube, cube, mat, coin) {
@@ -361,6 +364,12 @@ export class Project extends Scene {
                   .to3()[2],
           ) < 1
       ) {
+        if (isNaN(this.score)){
+          this.score = 0; //should not be evaluating to NaN but currently is
+        }
+        if (isNaN(this.lastCollisionValue)){
+          this.lastCollisionValue = 0; //should not be evaluating to NaN but currently is
+        }
         if ((barrier.coin_angle * 180) / Math.PI > 350) {
           if ((this.player_angle * 180) / Math.PI < 0) {
             if (
@@ -372,8 +381,13 @@ export class Project extends Scene {
             ) {
               // console.log("player angle:", ((((this.player_angle * 180) / Math.PI) % 360) + 360));
               // console.log("coin angle", (((barrier.coin_angle * 180) / Math.PI + 90) % 360));
-              // console.log("1");
+              console.log("1");
               this.last_collision = program_state.animation_time;
+              if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
+                this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
+                this.score = this.score + 1;
+              }
+              console.log("score: ", this.score);
             }
             if (
                 Math.abs(
@@ -384,8 +398,12 @@ export class Project extends Scene {
             ) {
               // console.log("player angle: ", (((this.player_angle * 180) / Math.PI) % 360) + 360);
               // console.log("coin angle", (((barrier.coin_angle * 180) / Math.PI + 90) % 360));
-              // console.log("2");
-              this.last_collision = program_state.animation_time;
+              console.log("2");
+              if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
+                this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
+                this.score = this.score + 1;
+              }
+              console.log("score: ", this.score);
             }
           } else {
             if (
@@ -396,8 +414,12 @@ export class Project extends Scene {
             ) {
               // console.log("player angle:", (((this.player_angle * 180) / Math.PI) % 360));
               // console.log("coin angle:", (((barrier.coin_angle * 180) / Math.PI + 90) % 360));
-              // console.log("3");
-              this.last_collision = program_state.animation_time;
+              console.log("3"); //works as expected
+              if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
+                this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
+                this.score = this.score + 1;
+              }
+              console.log("score: ", this.score);
             }
             if (
                 Math.abs(
@@ -407,8 +429,12 @@ export class Project extends Scene {
             ) {
               // console.log("player angle:", ((this.player_angle * 180) / Math.PI) % 360);
               // console.log("coin angle:", (((barrier.coin_angle * 180) / Math.PI + 90) % 360));
-              // console.log("4");
-              this.last_collision = program_state.animation_time;
+              console.log("4");
+              if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
+                this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
+                this.score = this.score + 1;
+              }
+              console.log("score: ", this.score);
             }
           }
         } else {
@@ -422,8 +448,12 @@ export class Project extends Scene {
             ) {
               // console.log("player angle", (((this.player_angle * 180) / Math.PI) % 360)+360);
               // console.log("coin angle: ", ((barrier.coin_angle * 180) / Math.PI + 90));
-              // console.log("5"); //working as expected
-              this.last_collision = program_state.animation_time;
+              console.log("5"); //working as expected
+              if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
+                this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
+                this.score = this.score + 1;
+              }
+              console.log("score: ", this.score);
             }
             if (
                 Math.abs(
@@ -434,8 +464,12 @@ export class Project extends Scene {
             ) {
               // console.log("player angle:", ((((this.player_angle * 180) / Math.PI) % 360) + 360));
               // console.log("coin angle:", ((barrier.coin_angle * 180) / Math.PI + 90));
-              // console.log("6"); //working as expected
-              this.last_collision = program_state.animation_time;
+              console.log("6"); //working as expected
+              if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
+                this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
+                this.score = this.score + 1;
+              }
+              console.log("score: ", this.score);
             }
           } else {
             if (
@@ -446,8 +480,12 @@ export class Project extends Scene {
             ) {
               // console.log("player angle", (((this.player_angle * 180) / Math.PI) % 360));
               // console.log("coin angle", ((barrier.coin_angle * 180) / Math.PI + 90));
-              // console.log("7"); //working as expected
-              this.last_collision = program_state.animation_time;
+              console.log("7"); //working as expected
+              if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
+                this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
+                this.score = this.score + 1;
+              }
+              console.log("score: ", this.score);
             }
             if (
                 Math.abs(
@@ -457,8 +495,12 @@ export class Project extends Scene {
             ) {
               // console.log("player angle: ", (((this.player_angle * 180) / Math.PI) % 360));
               // console.log("coin angle: ", ((barrier.coin_angle * 180) / Math.PI + 90));
-              // console.log("8"); //working as expected
-              this.last_collision = program_state.animation_time;
+              console.log("8"); //working as expected
+              if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
+                this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
+                this.score = this.score + 1;
+              }
+              console.log("score: ", this.score);
             }
           }
         }
@@ -535,14 +577,14 @@ export class Project extends Scene {
     this.checkCoinCollisions(program_state);
     const angle = Math.cos(0.005 * this.program_state.animation_time) ;
 
-    context.context.fillText("Score: " + this.score, context.width - 100, 30);
+    // this.score_display.set_string("Score: ", context.context);
+    // this.score_display.draw(
+    //     context,
+    //     program_state,
+    //     Mat4.identity().times(Mat4.translation(context.width - 100, 30, 0)),
+    //     this.text_image // Make sure to have this.text_image defined in your constructor
+    // );
 
-    // if ((this.platforms[0].coin_angle *180)/Math.PI > 270){
-    //   console.log("Coin Angle:", (((this.platforms[0].coin_angle *180)/Math.PI)+90)%360);
-    // }
-    // else {
-    //   console.log("Coin Angle:", ((this.platforms[0].coin_angle *180)/Math.PI)+90);
-    // }
     //console.log("Coin Angle:", (this.platforms[0].coin_angle *180)/Math.PI);
     //console.log("Player Angle:", (((this.player_angle * 180) / Math.PI)));
 
