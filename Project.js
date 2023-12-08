@@ -146,11 +146,7 @@ export class Project extends Scene {
     // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
     super();
     this.init()
-  }
 
-  init(){
-
-    // At the beginning of our program, load one of each of these shape definitions onto the GPU.
     this.shapes = {
       torus: new defs.Torus(15, 15),
       torus2: new defs.Torus(3, 15),
@@ -169,9 +165,6 @@ export class Project extends Scene {
 
     };
 
-    this.score = 0;
-
-    // *** Materials
     this.materials = {
       test: new Material(new defs.Phong_Shader(), {
         ambient: 1,
@@ -330,6 +323,19 @@ export class Project extends Scene {
       8 : 0.51,
       9 : 0.51
     }
+  }
+
+  init(){
+
+    // At the beginning of our program, load one of each of these shape definitions onto the GPU.
+
+
+    this.score = 0;
+
+    // *** Materials
+
+
+
 
     this.platform_radius = 5;
     this.platform_length = 50;
@@ -365,8 +371,6 @@ export class Project extends Scene {
     this.movement_speed = 1;
 
     this.last_collision = -10000;
-
-    this.character = new Player();
   }
 
 
@@ -377,13 +381,6 @@ export class Project extends Scene {
     if (!this.gameActive) this.program_state.animation_time = 0;
       this.gameActive = true;
     });
-    this.key_triggered_button( "restart", ["r"], () => {
-      if (this.lost){
-        this.init();
-        this.program_state.animation_time = 0;
-      }
-    });
-
     this.key_triggered_button( "Move Left", ["a"], () => {
        if(!this.paused) this.moving = -1;
     });
@@ -398,6 +395,12 @@ export class Project extends Scene {
       this.paused = !this.paused;
       this.moving = 0;
     });
+    this.key_triggered_button( "Restart", ["r"], () => {
+        if (this.lost){
+          this.init();
+          this.program_state.animation_time = 0;
+        }
+      });
   }
 
   //draws platforms, deletes old and adds new.
@@ -652,14 +655,14 @@ export class Project extends Scene {
             ) {
               // console.log("player angle:", ((((this.player_angle * 180) / Math.PI) % 360) + 360));
               // console.log("coin angle", (((barrier.coin_angle * 180) / Math.PI + 90) % 360));
-              console.log("1");
+              //console.log("1");
               this.last_collision = program_state.animation_time;
               if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
                 this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
                 this.score = this.score + 1;
                 barrier.coin = false;
               }
-              console.log("score: ", this.score);
+              //console.log("score: ", this.score);
             }
             if (
                 Math.abs(
@@ -670,13 +673,13 @@ export class Project extends Scene {
             ) {
               // console.log("player angle: ", (((this.player_angle * 180) / Math.PI) % 360) + 360);
               // console.log("coin angle", (((barrier.coin_angle * 180) / Math.PI + 90) % 360));
-              console.log("2");
+              //console.log("2");
               if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
                 this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
                 this.score = this.score + 1;
                 barrier.coin = false;
               }
-              console.log("score: ", this.score);
+              //console.log("score: ", this.score);
             }
           } else {
             if (
@@ -687,13 +690,13 @@ export class Project extends Scene {
             ) {
               // console.log("player angle:", (((this.player_angle * 180) / Math.PI) % 360));
               // console.log("coin angle:", (((barrier.coin_angle * 180) / Math.PI + 90) % 360));
-              console.log("3"); //works as expected
+              //console.log("3"); //works as expected
               if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
                 this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
                 this.score = this.score + 1;
                 barrier.coin = false;
               }
-              console.log("score: ", this.score);
+              //console.log("score: ", this.score);
             }
             if (
                 Math.abs(
@@ -703,13 +706,13 @@ export class Project extends Scene {
             ) {
               // console.log("player angle:", ((this.player_angle * 180) / Math.PI) % 360);
               // console.log("coin angle:", (((barrier.coin_angle * 180) / Math.PI + 90) % 360));
-              console.log("4");
+              //console.log("4");
               if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
                 this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
                 this.score = this.score + 1;
                 barrier.coin = false;
               }
-              console.log("score: ", this.score);
+              //console.log("score: ", this.score);
             }
           }
         } else {
@@ -721,15 +724,15 @@ export class Project extends Scene {
                     ((barrier.coin_angle * 180) / Math.PI + 90),
                 ) < 20
             ) {
-              // console.log("player angle", (((this.player_angle * 180) / Math.PI) % 360)+360);
-              // console.log("coin angle: ", ((barrier.coin_angle * 180) / Math.PI + 90));
-              console.log("5"); //working as expected
+              // //console.log("player angle", (((this.player_angle * 180) / Math.PI) % 360)+360);
+              // //console.log("coin angle: ", ((barrier.coin_angle * 180) / Math.PI + 90));
+              //console.log("5"); //working as expected
               if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
                 this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
                 this.score = this.score + 1;
                 barrier.coin = false;
               }
-              console.log("score: ", this.score);
+              //console.log("score: ", this.score);
             }
             if (
                 Math.abs(
@@ -738,15 +741,15 @@ export class Project extends Scene {
                     ((barrier.coin_angle * 180) / Math.PI + 90),
                 ) > 340
             ) {
-              // console.log("player angle:", ((((this.player_angle * 180) / Math.PI) % 360) + 360));
-              // console.log("coin angle:", ((barrier.coin_angle * 180) / Math.PI + 90));
-              console.log("6"); //working as expected
+              // //console.log("player angle:", ((((this.player_angle * 180) / Math.PI) % 360) + 360));
+              // //console.log("coin angle:", ((barrier.coin_angle * 180) / Math.PI + 90));
+              //console.log("6"); //working as expected
               if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
                 this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
                 this.score = this.score + 1;
                 barrier.coin = false;
               }
-              console.log("score: ", this.score);
+              //console.log("score: ", this.score);
             }
           } else {
             if (
@@ -755,15 +758,15 @@ export class Project extends Scene {
                     ((barrier.coin_angle * 180) / Math.PI + 90),
                 ) < 20
             ) {
-              // console.log("player angle", (((this.player_angle * 180) / Math.PI) % 360));
-              // console.log("coin angle", ((barrier.coin_angle * 180) / Math.PI + 90));
-              console.log("7"); //working as expected
+              // //console.log("player angle", (((this.player_angle * 180) / Math.PI) % 360));
+              // //console.log("coin angle", ((barrier.coin_angle * 180) / Math.PI + 90));
+              //console.log("7"); //working as expected
               if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
                 this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
                 this.score = this.score + 1;
                 barrier.coin = false;
               }
-              console.log("score: ", this.score);
+              //console.log("score: ", this.score);
             }
             if (
                 Math.abs(
@@ -771,15 +774,15 @@ export class Project extends Scene {
                     ((barrier.coin_angle * 180) / Math.PI + 90),
                 ) > 340
             ) {
-              // console.log("player angle: ", (((this.player_angle * 180) / Math.PI) % 360));
-              // console.log("coin angle: ", ((barrier.coin_angle * 180) / Math.PI + 90));
-              console.log("8"); //working as expected
+              // //console.log("player angle: ", (((this.player_angle * 180) / Math.PI) % 360));
+              // //console.log("coin angle: ", ((barrier.coin_angle * 180) / Math.PI + 90));
+              //console.log("8"); //working as expected
               if ((barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2] - this.lastCollisionValue) > 10) {
                 this.lastCollisionValue = barrier.base_transform.times(vec4(0, 0, 25, 1)).to3()[2];
                 this.score = this.score + 1;
                 barrier.coin = false;
               }
-              console.log("score: ", this.score);
+              //console.log("score: ", this.score);
             }
           }
         }
@@ -875,7 +878,7 @@ export class Project extends Scene {
     
      if (this.last_collision > 0) {
          this.lost = true;
-         console.log("collision");
+         //console.log("collision");
        }
   
       if (this.gameActive && !this.lost) {
