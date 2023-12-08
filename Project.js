@@ -137,7 +137,7 @@ export class Platform {
 //   Mat4.identity().times(Mat4.rotation( 2 * angle,0, 1, 0)),
 //   this.materials.coin,
 // );
-
+// 
 
   }
 }
@@ -216,6 +216,26 @@ export class Project extends Scene {
         color: hex_color("#000000"),
         ambient: 1,
         texture: new Texture("assets/lose-screen-flipped.png"),
+      }),
+      player_anim1: new Material(new Textured_Phong(), {
+        color: hex_color("#000000"),
+        ambient: 1,
+        texture: new Texture("assets/player-anim1.png"),
+      }),
+      player_anim2: new Material(new Textured_Phong(), {
+        color: hex_color("#000000"),
+        ambient: 1,
+        texture: new Texture("assets/player-anim2.png"),
+      }),
+      player_anim3: new Material(new Textured_Phong(), {
+        color: hex_color("#000000"),
+        ambient: 1,
+        texture: new Texture("assets/player-anim3.png"),
+      }),
+      player_anim4: new Material(new Textured_Phong(), {
+        color: hex_color("#000000"),
+        ambient: 1,
+        texture: new Texture("assets/player-anim4.png"),
       }),
       SCORE_TEXT: new Material(new defs.Textured_Phong(), {
         ambient: 1,
@@ -424,22 +444,44 @@ export class Project extends Scene {
 
     let depth_transform = Mat4.translation(0, 0, this.player_depth);
 
-    let normal = hex_color("#0000FF");
-    let hit = hex_color("#FFFF00");
-
-    this.shapes.sphere.draw(
-      context,
-      program_state,
-      Mat4.rotation(this.player_angle, 0, 0, 1)
-        .times(this.player_transform)
-        .times(depth_transform),
-      this.materials.player_material.override({
-        color:
-          program_state.animation_time - this.last_collision < 1000
-            ? hit
-            : normal,
-      }),
-    );
+    const num = this.paused ? 4: Math.floor(this.program_state.animation_time % 4);
+    if (num === 0) {
+      this.shapes.square.draw(
+        context,
+        program_state,
+        Mat4.rotation(this.player_angle, 0, 0, 1)
+          .times(this.player_transform)
+          .times(depth_transform),
+        this.materials.player_anim4,
+      );
+    } else if (num === 1) {
+      this.shapes.square.draw(
+        context,
+        program_state,
+        Mat4.rotation(this.player_angle, 0, 0, 1)
+          .times(this.player_transform)
+          .times(depth_transform),
+        this.materials.player_anim3,
+      );
+    } else if (num === 2) {
+      this.shapes.square.draw(
+        context,
+        program_state,
+        Mat4.rotation(this.player_angle, 0, 0, 1)
+          .times(this.player_transform)
+          .times(depth_transform),
+        this.materials.player_anim2,
+      );
+    } else {
+      this.shapes.square.draw(
+        context,
+        program_state,
+        Mat4.rotation(this.player_angle, 0, 0, 1)
+          .times(this.player_transform)
+          .times(depth_transform),
+        this.materials.player_anim1,
+      );
+    }
   }
 
   //camera setup such that it follows the player at an offset, light source from camera as well
