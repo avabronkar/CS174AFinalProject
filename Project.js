@@ -593,7 +593,7 @@ export class Project extends Scene {
                     (((this.player_angle * 180) / Math.PI) % 360) +
                     360 -
                     (((barrier.coin_angle * 180) / Math.PI + 90) % 360),
-                ) < 10
+                ) < 20
             ) {
               // console.log("player angle:", ((((this.player_angle * 180) / Math.PI) % 360) + 360));
               // console.log("coin angle", (((barrier.coin_angle * 180) / Math.PI + 90) % 360));
@@ -611,7 +611,7 @@ export class Project extends Scene {
                     (((this.player_angle * 180) / Math.PI) % 360) +
                     360 -
                     (((barrier.coin_angle * 180) / Math.PI + 90) % 360),
-                ) > 350
+                ) > 340
             ) {
               // console.log("player angle: ", (((this.player_angle * 180) / Math.PI) % 360) + 360);
               // console.log("coin angle", (((barrier.coin_angle * 180) / Math.PI + 90) % 360));
@@ -628,7 +628,7 @@ export class Project extends Scene {
                 Math.abs(
                     (((this.player_angle * 180) / Math.PI) % 360) -
                     (((barrier.coin_angle * 180) / Math.PI + 90) % 360),
-                ) < 10
+                ) < 20
             ) {
               // console.log("player angle:", (((this.player_angle * 180) / Math.PI) % 360));
               // console.log("coin angle:", (((barrier.coin_angle * 180) / Math.PI + 90) % 360));
@@ -644,7 +644,7 @@ export class Project extends Scene {
                 Math.abs(
                     (((this.player_angle * 180) / Math.PI) % 360) -
                     (((barrier.coin_angle * 180) / Math.PI + 90) % 360),
-                ) > 350
+                ) > 340
             ) {
               // console.log("player angle:", ((this.player_angle * 180) / Math.PI) % 360);
               // console.log("coin angle:", (((barrier.coin_angle * 180) / Math.PI + 90) % 360));
@@ -664,7 +664,7 @@ export class Project extends Scene {
                     (((this.player_angle * 180) / Math.PI) % 360) +
                     360 -
                     ((barrier.coin_angle * 180) / Math.PI + 90),
-                ) < 10
+                ) < 20
             ) {
               // console.log("player angle", (((this.player_angle * 180) / Math.PI) % 360)+360);
               // console.log("coin angle: ", ((barrier.coin_angle * 180) / Math.PI + 90));
@@ -681,7 +681,7 @@ export class Project extends Scene {
                     (((this.player_angle * 180) / Math.PI) % 360) +
                     360 -
                     ((barrier.coin_angle * 180) / Math.PI + 90),
-                ) > 350
+                ) > 340
             ) {
               // console.log("player angle:", ((((this.player_angle * 180) / Math.PI) % 360) + 360));
               // console.log("coin angle:", ((barrier.coin_angle * 180) / Math.PI + 90));
@@ -698,7 +698,7 @@ export class Project extends Scene {
                 Math.abs(
                     (((this.player_angle * 180) / Math.PI) % 360) -
                     ((barrier.coin_angle * 180) / Math.PI + 90),
-                ) < 10
+                ) < 20
             ) {
               // console.log("player angle", (((this.player_angle * 180) / Math.PI) % 360));
               // console.log("coin angle", ((barrier.coin_angle * 180) / Math.PI + 90));
@@ -714,7 +714,7 @@ export class Project extends Scene {
                 Math.abs(
                     (((this.player_angle * 180) / Math.PI) % 360) -
                     ((barrier.coin_angle * 180) / Math.PI + 90),
-                ) > 350
+                ) > 340
             ) {
               // console.log("player angle: ", (((this.player_angle * 180) / Math.PI) % 360));
               // console.log("coin angle: ", ((barrier.coin_angle * 180) / Math.PI + 90));
