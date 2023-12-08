@@ -160,7 +160,6 @@ export class Project extends Scene {
   }
 
   init(){
-    this.program_state = null;
 
     // At the beginning of our program, load one of each of these shape definitions onto the GPU.
     this.shapes = {
@@ -335,7 +334,7 @@ export class Project extends Scene {
     );
     this.player_angle = 0;
 
-    
+    this.lastCollisionValue = 0;
 
     this.moving = 0; //-1 for left, 0 for none, 1 for right
 
