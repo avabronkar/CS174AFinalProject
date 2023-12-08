@@ -147,7 +147,7 @@ class Player{
     sphere.draw(
         context,
         program_state,
-        player_transform.times(Mat4.scale(0.5, 0.5, 0.5)).times(Mat4.translation(0, 2, 0)),
+        player_transform,//.times(Mat4.scale(0.5, 0.5, 0.5)).times(Mat4.translation(0, 2, 0)),
         player_mat
     );
   }
@@ -369,7 +369,6 @@ export class Project extends Scene {
     if (!this.gameActive) this.program_state.animation_time = 0;
       this.gameActive = true;
     });
-
     this.key_triggered_button( "restart", ["r"], () => {
       if (this.lost){
         this.init();
@@ -377,17 +376,13 @@ export class Project extends Scene {
       }
     });
 
-    this.key_triggered_button(
-      "Move Left",
-      ["a"],
-      () => (this.moving = 1),
-    );
+    this.key_triggered_button( "Move Left", ["a"], () => {
+       if(!this.paused) this.moving = -1;
+    });
     this.key_triggered_button("Stop", ["s"], () => (this.moving = 0));
-    this.key_triggered_button(
-      "Move Right",
-      ["d"],
-      () => (this.moving = -1),
-    );
+    this.key_triggered_button("Move Right", ["d"], () => {
+        if(!this.paused) this.moving = 1;
+    });
     this.key_triggered_button("Pause", ["p"], () => {
       if (!this.paused)
         this.saved_animation_time = this.program_state.animation_time;
