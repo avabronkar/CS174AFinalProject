@@ -16,6 +16,7 @@ const {
   Shape,
   Material,
   Scene,
+    Texture
 } = tiny;
 
 export class Platform {
@@ -33,7 +34,7 @@ export class Platform {
     this.lastCollisionValue = 0;
   }
 
-  draw(context, program_state, tube, cube, mat, coin) {
+  draw(context, program_state, tube, cube, mat, barrier_mat) {
     let model_transform = this.base_transform.times(
       Mat4.scale(this.radius, this.radius, this.len),
     );
@@ -51,7 +52,7 @@ export class Platform {
         context,
         program_state,
         Mat4.rotation(this.barrier_angle, 0, 0, 1).times(barrier_transform),
-        mat.override({ color: red, diffusivity: 1, ambient: 0.2 }),
+          barrier_mat.override({ color: red, diffusivity: 1, ambient: 0.2 }),
       );
 
       const coin_transform = Mat4.translation(this.radius, 0, this.start_pos + this.len/2 + 25,)
@@ -107,6 +108,18 @@ export class Project extends Scene {
         ambient: 1,
         specularity: 0,
         color: hex_color("#ffffff"),
+      }),
+      pipe:  new Material(new defs.Textured_Phong(), {
+        ambient: 0.3,
+        specularity: 0,
+        color: hex_color("#A9A9A9"),
+        texture: new Texture("assets/pipe.jpg")
+      }),
+      chain:  new Material(new defs.Textured_Phong(), {
+        ambient: 0.3,
+        specularity: 0,
+        color: hex_color("#A9A9A9"),
+        texture: new Texture("assets/chain.png")
       }),
       player_material: new Material(new defs.Phong_Shader(), {
         ambient: 0.4,
@@ -201,9 +214,9 @@ export class Project extends Scene {
         this.shapes.cube,
         //this.shapes.sphere,
         //this.shapes.coin,
-        this.materials.test.override({
-          color: (i + this.next_platform) % 2 === 0 ? red : purple,
-        }),
+        this.materials.pipe,
+            //.override({ color: (i + this.next_platform) % 2 === 0 ? red : purple, }),
+        this.materials.chain
       );
     }
 
