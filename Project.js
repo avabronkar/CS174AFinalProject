@@ -19,6 +19,69 @@ const {
     Texture
 } = tiny;
 
+const { Textured_Phong } = defs;
+
+
+class RectRatio {
+    extEuclid(x, y) {
+      while (y !== 0) {
+        const t = y;
+        y = x % y;
+        x = t;
+      }
+      return x;
+    }
+  
+    constructor(divisor, dividend) {
+      this.divisor = divisor;
+      this.dividend = dividend;
+  
+      this.gcd = this.extEuclid(this.divisor, this.dividend);
+      this.simplifiedDivisor = this.divisor / this.gcd;
+      this.simplifiedDividend = this.dividend / this.gcd;
+    }
+  }
+  class Rect extends defs.Square {
+    /**
+     * @param {RectRatio} ratio
+     * @param {Boolean} vertical
+     */
+    constructor(ratio, vertical) {
+      const simplifiedDivisor = ratio.simplifiedDivisor;
+      const simplifiedDividend = ratio.simplifiedDividend;
+  
+      super("position", "normal", "texture_coord");
+  
+      if (vertical) {
+        this.arrays.position = Vector3.cast(
+          [-simplifiedDivisor, -simplifiedDividend, 0],
+          [simplifiedDivisor, -simplifiedDividend, 0],
+          [-simplifiedDivisor, simplifiedDividend, 0],
+          [simplifiedDivisor, simplifiedDividend, 0],
+        );
+      } else {
+        this.arrays.position = Vector3.cast(
+          [-simplifiedDividend, -simplifiedDivisor, 0],
+          [simplifiedDividend, -simplifiedDivisor, 0],
+          [-simplifiedDividend, simplifiedDivisor, 0],
+          [simplifiedDividend, simplifiedDivisor, 0],
+        );
+      }
+  
+      this.arrays.normal = Vector3.cast(
+        [0, 0, 1],
+        [0, 0, 1],
+        [0, 0, 1],
+        [0, 0, 1],
+      );
+      // Arrange the vertices into a square shape in texture space too:
+      this.arrays.texture_coord = Vector.cast([0, 0], [1, 0], [0, 1], [1, 1]);
+      // Use two triangles this time, indexing into four distinct vertices:
+      this.indices.push(0, 1, 2, 1, 3, 2);
+    }
+  }  
+
+
 export class Platform {
   constructor(start_pos, length, radius, barrier = true, paused, score) {
     this.start_pos = start_pos;
@@ -100,8 +163,9 @@ export class Project extends Scene {
         [0, 2],
         [0, 1],
       ]),
-      // TODO:  Fill in as many additional shape instances as needed in this key/value table.
-      //        (Requirement 1)
+      rect: new Rect(new RectRatio(1, 2), false),
+      square: new Rect(new RectRatio(1, 1), false),
+      
     };
 
     this.score = 0;
@@ -112,6 +176,14 @@ export class Project extends Scene {
         ambient: 1,
         specularity: 0,
         color: hex_color("#ffffff"),
+      }),
+      test2: new Material(new defs.Basic_Shader(), {
+        color: hex_color("#ffffff"),
+      }),
+      rect: new Material(new defs.Phong_Shader(), {
+        ambient: 1,
+        diffusivity: 0,
+        color: hex_color("#f55fff"),
       }),
       pipe:  new Material(new defs.Textured_Phong(), {
         ambient: 0.3,
@@ -134,6 +206,16 @@ export class Project extends Scene {
         ambient: 0.4,
         diffusivity: 0.6,
         color: hex_color("#0000FF"),
+      }),
+      start_screen: new Material(new Textured_Phong(), {
+        color: hex_color("#000000"),
+        ambient: 1,
+        texture: new Texture("assets/start-screen-flipped.png"),
+      }),
+      lose_screen: new Material(new Textured_Phong(), {
+        color: hex_color("#000000"),
+        ambient: 1,
+        texture: new Texture("assets/lose-screen-flipped.png"),
       }),
       SCORE_TEXT: new Material(new defs.Textured_Phong(), {
         ambient: 1,
@@ -201,8 +283,6 @@ export class Project extends Scene {
         color: hex_color("#FFFFFF"),
         texture: new Texture("assets/9.png")
       }),
-      // TODO:  Fill in as many additional material objects as needed in this key/value table.
-      //        (Requirement 4)
     };
 
     this.widths = {
@@ -242,7 +322,13 @@ export class Project extends Scene {
     );
     this.player_angle = 0;
 
+    
+
     this.moving = 0; //-1 for left, 0 for none, 1 for right
+
+    this.gameActive = false;
+    this.lost = false;
+
     this.paused = false;
     this.saved_animation_time = 0;
 
@@ -262,16 +348,20 @@ export class Project extends Scene {
 
   make_control_panel() {
     // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
+    this.key_triggered_button( "Start", ["g"], () => {
+    if (!this.gameActive) this.program_state.animation_time = 0;
+      this.gameActive = true;
+    });
     this.key_triggered_button(
-      "Move clockwise",
+      "Move Left",
       ["a"],
-      () => (this.moving = -1),
+      () => (this.moving = 1),
     );
     this.key_triggered_button("Stop", ["s"], () => (this.moving = 0));
     this.key_triggered_button(
-      "Move counter-clockwise",
+      "Move Right",
       ["d"],
-      () => (this.moving = 1),
+      () => (this.moving = -1),
     );
     this.key_triggered_button("Pause", ["p"], () => {
       if (!this.paused)
@@ -644,7 +734,24 @@ export class Project extends Scene {
       }
     }
   }
+  showStartScreen(context, program_state) {
+    this.shapes.square.draw(
+      context,
+      program_state,
+      Mat4.translation(0, 0, -13),
+      this.materials.start_screen,
+    );
+  }
 
+  showLoseScreen(context, program_state) {
+    let depth_transform = Mat4.translation(0, 0, this.player_depth - 12);
+    this.shapes.square.draw(
+      context,
+      program_state,
+      depth_transform,
+      this.materials.lose_screen,
+    );
+  }
   display(context, program_state) {
     // display():  Called once per frame of animation.
     // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
@@ -708,22 +815,27 @@ export class Project extends Scene {
 
     this.program_state = program_state;
     this.camera(context, program_state);
-    this.platform(context, program_state);
-    this.player(context, program_state);
-    this.checkBarrierCollisions(program_state);
-    this.checkCoinCollisions(program_state);
-    const angle = Math.cos(0.005 * this.program_state.animation_time) ;
-
-    // this.score_display.set_string("Score: ", context.context);
-    // this.score_display.draw(
-    //     context,
-    //     program_state,
-    //     Mat4.identity().times(Mat4.translation(context.width - 100, 30, 0)),
-    //     this.text_image // Make sure to have this.text_image defined in your constructor
-    // );
-
-    //console.log("Coin Angle:", (this.platforms[0].coin_angle *180)/Math.PI);
-    //console.log("Player Angle:", (((this.player_angle * 180) / Math.PI)));
+    // this.platform(context, program_state);
+    // this.player(context, program_state);
+    // this.checkBarrierCollisions(program_state);
+    // this.checkCoinCollisions(program_state);
+    // const angle = Math.cos(0.005 * this.program_state.animation_time) ;
+    
+     if (this.last_collision > 0) {
+         this.lost = true;
+         console.log("collision");
+       }
+  
+      if (this.gameActive && !this.lost) {
+        this.platform(context, program_state);
+        this.player(context, program_state);
+        this.checkBarrierCollisions(program_state);
+        this.checkCoinCollisions(program_state);
+      } else if (this.lost) {
+        this.showLoseScreen(context, program_state);
+      } else {
+        this.showStartScreen(context, program_state);
+      }
 
   }
 }
