@@ -30,7 +30,6 @@ export class Platform {
     this.coin_angle = 2 * Math.PI * Math.random();
     this.paused = paused;
     //this.score_display = new Text_Line(10);
-    this.score = 0;
     this.lastCollisionValue = 0;
     this.coin = true;
   }
@@ -48,6 +47,7 @@ export class Platform {
         0,
         this.start_pos + this.len / 2,
       ).times(Mat4.scale(this.radius, this.radius, 0.1));
+
       cube.draw(
         context,
         program_state,
@@ -92,6 +92,7 @@ export class Project extends Scene {
       sphere: new defs.Subdivision_Sphere(4),
       circle: new defs.Regular_2D_Polygon(1, 15),
       cube: new (defs.Cube.prototype.make_flat_shaded_version())(),
+      square: new defs.Square(),
       //coin: new defs.Torus(50, 50),
       //coin: new defs.Subdivision_Sphere(4),
       coin: new defs.Capped_Cylinder(20, 20, [0, 2], [0, 1]),
@@ -102,6 +103,8 @@ export class Project extends Scene {
       // TODO:  Fill in as many additional shape instances as needed in this key/value table.
       //        (Requirement 1)
     };
+
+    this.score = 0;
 
     // *** Materials
     this.materials = {
@@ -132,9 +135,100 @@ export class Project extends Scene {
         diffusivity: 0.6,
         color: hex_color("#0000FF"),
       }),
+      SCORE_TEXT: new Material(new defs.Textured_Phong(), {
+        ambient: 1,
+        specularity: 0,
+        color: hex_color("#FFFFFF"),
+        texture: new Texture("assets/SCORE.png")
+      }),
+      0: new Material(new defs.Textured_Phong(), {
+        ambient: 1,
+        specularity: 0,
+        color: hex_color("#FFFFFF"),
+        texture: new Texture("assets/0.png")
+      }),
+      1: new Material(new defs.Textured_Phong(), {
+        ambient: 1,
+        specularity: 0,
+        color: hex_color("#FFFFFF"),
+        texture: new Texture("assets/1.png")
+      }),
+      2: new Material(new defs.Textured_Phong(), {
+        ambient: 1,
+        specularity: 0,
+        color: hex_color("#FFFFFF"),
+        texture: new Texture("assets/2.png")
+      }),
+      3: new Material(new defs.Textured_Phong(), {
+        ambient: 1,
+        specularity: 0,
+        color: hex_color("#FFFFFF"),
+        texture: new Texture("assets/3.png")
+      }),
+      4: new Material(new defs.Textured_Phong(), {
+        ambient: 1,
+        specularity: 0,
+        color: hex_color("#FFFFFF"),
+        texture: new Texture("assets/4.png")
+      }),
+      5: new Material(new defs.Textured_Phong(), {
+        ambient: 1,
+        specularity: 0,
+        color: hex_color("#FFFFFF"),
+        texture: new Texture("assets/5.png")
+      }),
+      6: new Material(new defs.Textured_Phong(), {
+        ambient: 1,
+        specularity: 0,
+        color: hex_color("#FFFFFF"),
+        texture: new Texture("assets/6.png")
+      }),
+      7: new Material(new defs.Textured_Phong(), {
+        ambient: 1,
+        specularity: 0,
+        color: hex_color("#FFFFFF"),
+        texture: new Texture("assets/7.png")
+      }),
+      8: new Material(new defs.Textured_Phong(), {
+        ambient: 1,
+        specularity: 0,
+        color: hex_color("#FFFFFF"),
+        texture: new Texture("assets/8.png")
+      }),
+      9: new Material(new defs.Textured_Phong(), {
+        ambient: 1,
+        specularity: 0,
+        color: hex_color("#FFFFFF"),
+        texture: new Texture("assets/9.png")
+      }),
       // TODO:  Fill in as many additional material objects as needed in this key/value table.
       //        (Requirement 4)
     };
+
+    this.widths = {
+      0 : 0.035,
+      1 : 0.022,
+      2 : 0.034,
+      3 : 0.035,
+      4 : 0.035,
+      5 : 0.038,
+      6 : 0.035,
+      7 : 0.035,
+      8 : 0.037,
+      9 : 0.035
+    }
+    this.offsets = {
+      0 : 0.51,
+      1 : 0.52,
+      2 : 0.51,
+      3 : 0.51,
+      4 : 0.51,
+      5 : 0.51,
+      6 : 0.51,
+      7 : 0.512,
+      8 : 0.51,
+      9 : 0.51
+    }
 
     this.platform_radius = 5;
     this.platform_length = 50;
@@ -271,6 +365,21 @@ export class Project extends Scene {
     program_state.lights = [new Light(eye, color(1, 1, 1, 1), 1000)];
     this.camera_position = Mat4.look_at(eye.to3(), at.to3(), up.to3());
     program_state.set_camera(this.camera_position);
+
+    this.shapes.square.draw(context, program_state, Mat4.translation(0.63, 0.3, 1).times(this.camera_position).times(Mat4.scale(0.1, 0.1, 1)), this.materials.SCORE_TEXT);
+
+
+    let str = this.score.toString()
+
+    let delX = 0;
+
+    for (let i = 0; i < str.length; i++){
+      let num = parseInt(str[i])
+      this.shapes.square.draw(context, program_state, Mat4.translation(delX + this.offsets[num], 0.38, 1).times(this.camera_position).times(Mat4.scale(0.02, 0.02, 1)), this.materials[num]);
+      delX -= this.widths[num];
+    }
+
+
   }
 
   checkBarrierCollisions(program_state) {
