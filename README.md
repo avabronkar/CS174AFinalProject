@@ -1,7 +1,8 @@
-# CS174A Final Project
+# CS174A Final Project: Sewer Surfer
 
-## Project Name: Sewer Surfer
-* **Storyline: ** 
+**Team Members** : Ava Bronkar, Jenny Cho, Aaryaman Bhute
+
+**Storyline/Theme**: 
     There is a tunnel with gold coins inside. An officer must navigate through the tunnel and collect the gold coins without touching any of the barriers.
 
 
@@ -9,7 +10,7 @@
 
 
 ## Game Instructions 
-You must control the movements of the officer character in the game using the following keyboard keys
+You must control the movements of the officer character in the game using the following keyboard keys:
   * [g] Start Game
   * [a] Move the character left
   * [s] Stop the character
