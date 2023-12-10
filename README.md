@@ -1,9 +1,9 @@
-# CS174A Final Project: Sewer Surfer
+# CS174A Final Project: Sewer Surfers
 
 **Team Members** : Ava Bronkar, Jenny Cho, Aaryaman Bhute
 
 **Storyline/Theme**: 
-    There is a tunnel with gold coins inside. An officer must navigate through the tunnel and collect the gold coins without touching any of the barriers.
+    A burglar is on the loose with a bag of gold coins from a town's local bank. He is fleeing through a sewer tunnel, and it is your job as an officer to navigate through the tunnel and collect the gold coins without touching any of the barriers.
 
 
 ![image](assets/start-screen-unflipped.png)
